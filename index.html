@@ -3,527 +3,562 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connect & Climb: Mobile Ready</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Connect & Climb | Strategic Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --brand: #2c3e50;
-            --accent: #3498db;
-            --success: #27ae60;
-            --warning: #f39c12;
-            --light: #ecf0f1;
+            --primary: #2c3e50;    /* Navy */
+            --accent: #3498db;     /* Blue */
+            --success: #27ae60;    /* Green */
+            --warning: #f39c12;    /* Orange */
+            --danger: #e74c3c;     /* Red */
+            --light: #f8f9fa;
             --white: #ffffff;
+            --dark: #343a40;
+            --shadow: 0 4px 6px rgba(0,0,0,0.05);
+            --radius: 12px;
         }
+
+        * { box-sizing: border-box; transition: all 0.2s ease; }
 
         body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             margin: 0;
-            background-color: #f4f7f6;
-            color: #333;
+            background-color: #f0f2f5;
+            color: var(--dark);
             display: flex;
-            height: 100vh;
-            overflow: hidden; /* Prevent body scroll, handle in containers */
+            min-height: 100vh;
         }
 
-        /* --- RESPONSIVE SIDEBAR --- */
-        .sidebar {
-            width: 260px;
-            background-color: var(--brand);
-            color: white;
+        /* --- LAYOUT STRUCTURE --- */
+        .app-container {
             display: flex;
-            flex-direction: column;
-            padding: 20px;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            overflow-y: auto;
-            flex-shrink: 0;
-            transition: 0.3s;
-        }
-
-        .logo {
-            font-size: 1.4rem;
-            font-weight: bold;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding-bottom: 20px;
-            margin-bottom: 20px;
-        }
-
-        .logo span { color: var(--accent); }
-
-        .nav-links { list-style: none; padding: 0; margin: 0; }
-        .nav-links li {
-            padding: 15px;
-            cursor: pointer;
-            border-radius: 8px;
-            margin-bottom: 5px;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1rem;
-        }
-        .nav-links li:hover, .nav-links li.active {
-            background-color: var(--accent);
-            color: white;
-        }
-
-        .team-info {
-            margin-top: auto;
-            font-size: 0.8rem;
-            color: #bdc3c7;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 20px;
-        }
-
-        /* --- MAIN CONTENT AREA --- */
-        .main-container {
-            flex: 1;
-            overflow-y: auto; /* Allow scrolling here */
-            padding: 30px;
-            position: relative;
             width: 100%;
         }
 
-        .section { display: none; animation: fadeIn 0.4s ease; }
-        .section.active { display: block; }
+        /* --- SIDEBAR (Desktop) --- */
+        .sidebar {
+            width: 280px;
+            background: var(--white);
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #e9ecef;
+            padding: 2rem 1.5rem;
+            z-index: 100;
+        }
+
+        .brand {
+            margin-bottom: 3rem;
+        }
+        .brand h1 { margin: 0; font-size: 1.4rem; color: var(--primary); letter-spacing: -0.5px; }
+        .brand span { font-size: 0.8rem; color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: none;
+            padding: 1rem;
+            text-align: left;
+            font-size: 1rem;
+            color: #6c757d;
+            border-radius: var(--radius);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+        }
+
+        .nav-btn:hover { background: var(--light); color: var(--primary); }
+        .nav-btn.active { background: var(--primary); color: var(--white); box-shadow: 0 4px 10px rgba(44, 62, 80, 0.2); }
+        .nav-btn i { width: 24px; text-align: center; }
+
+        .program-badge {
+            margin-top: auto;
+            background: var(--light);
+            padding: 1rem;
+            border-radius: var(--radius);
+            font-size: 0.8rem;
+            color: #6c757d;
+            border: 1px solid #e9ecef;
+            text-align: center;
+        }
+
+        /* --- MAIN CONTENT --- */
+        main {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%; /* Fix for flex child width */
+        }
+
+        .section-view { display: none; animation: fadeIn 0.4s ease-out; }
+        .section-view.active { display: block; }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .header h1 { margin: 0; color: var(--brand); font-size: 1.5rem; }
-        .header p { margin: 5px 0 0; color: #7f8c8d; }
+        .page-header { margin-bottom: 2rem; }
+        .page-header h2 { font-size: 2rem; margin: 0 0 0.5rem 0; color: var(--primary); }
+        .page-header p { margin: 0; color: #6c757d; font-size: 1.1rem; }
 
-        /* --- WIDGETS --- */
-        .kpi-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-bottom: 30px;
+        /* --- STRATEGY CARDS --- */
+        .strategy-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5rem;
         }
 
         .card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            text-align: center;
-        }
-        
-        .card h3 { font-size: 0.85rem; color: #7f8c8d; text-transform: uppercase; margin: 0; }
-        .card .value { font-size: 2rem; font-weight: bold; color: var(--brand); margin: 10px 0; }
-        
-        .charts-row {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        .chart-box {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            min-height: 250px;
-        }
-
-        .controls {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
+            background: var(--white);
+            padding: 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid #e9ecef;
             display: flex;
-            align-items: center;
-            gap: 20px;
-            flex-wrap: wrap;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            flex: 1 1 300px; /* Flexible width */
+            max-width: 600px;
         }
 
-        /* --- AGENDA STYLES --- */
-        .agenda-grid {
+        .card-icon-bg {
+            position: absolute;
+            top: -10px; right: -10px;
+            font-size: 5rem;
+            opacity: 0.05;
+            transform: rotate(15deg);
+        }
+
+        .card h3 { margin: 0 0 1rem 0; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
+        .card p { color: #6c757d; line-height: 1.6; margin: 0; }
+
+        /* Status Colors */
+        .status-danger { border-left: 5px solid var(--danger); }
+        .status-success { border-left: 5px solid var(--success); }
+        .status-info { border-left: 5px solid var(--accent); }
+        .status-warning { border-left: 5px solid var(--warning); }
+
+        .status-danger h3 i { color: var(--danger); }
+        .status-success h3 i { color: var(--success); }
+        .status-info h3 i { color: var(--accent); }
+        .status-warning h3 i { color: var(--warning); }
+
+        /* --- ROADMAP TIMELINE --- */
+        .roadmap-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            gap: 2rem;
+        }
+
+        .week-column {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .week-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--light);
+            color: var(--primary);
         }
         
-        .day-card {
-            background: white;
-            border-left: 5px solid var(--accent);
+        .day-item {
+            background: var(--light);
             border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        .week-title {
-            grid-column: 1 / -1;
-            margin: 20px 0 10px;
-            color: var(--brand);
-            border-bottom: 2px solid #ecf0f1;
-            padding-bottom: 5px;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid transparent;
         }
 
-        /* --- MOBILE RESPONSIVENESS (MEDIA QUERIES) --- */
+        .day-item:hover { transform: translateX(5px); background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+
+        .week-1 .day-item { border-left-color: var(--accent); }
+        .week-2 .day-item { border-left-color: var(--success); }
+
+        .day-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; }
+        .day-title { font-weight: 700; color: var(--dark); font-size: 1rem; }
+        .tag { font-size: 0.7rem; padding: 4px 8px; border-radius: 4px; font-weight: 700; text-transform: uppercase; background: #fff; border: 1px solid #dee2e6; }
+
+        .day-content ul { margin: 0; padding-left: 1.2rem; color: #555; font-size: 0.9rem; line-height: 1.5; }
+        .day-content li { margin-bottom: 4px; }
+
+        /* --- TEAM GRID --- */
+        .team-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5rem;
+        }
+
+        .team-card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: var(--radius);
+            text-align: center;
+            box-shadow: var(--shadow);
+            border: 1px solid #e9ecef;
+            flex: 1 1 220px; /* Flexible width */
+            max-width: 400px;
+        }
+
+        .team-card.lead { background: linear-gradient(to bottom right, #fff, #fffbf0); border-color: #ffeeba; }
+
+        .avatar {
+            width: 80px; height: 80px;
+            background: var(--light);
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem; font-weight: 700;
+            margin: 0 auto 1rem;
+            border: 4px solid var(--white);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .lead .avatar { color: var(--warning); background: #fff8e1; }
+
+        .team-card h3 { margin: 0 0 0.5rem 0; font-size: 1.1rem; }
+        .team-card p { margin: 0; font-size: 0.85rem; color: #6c757d; }
+
+        /* --- RESPONSIVE DESIGN --- */
+        @media (max-width: 1024px) {
+            .roadmap-container { grid-template-columns: 1fr; }
+        }
+
         @media (max-width: 768px) {
-            body {
-                flex-direction: column; /* Stack layout vertically */
-                height: 100%;
-                overflow: auto;
-            }
-
+            .app-container { flex-direction: column; padding-bottom: 80px; /* Space for bottom nav */ }
+            
+            /* Sidebar becomes Bottom Nav */
             .sidebar {
                 width: 100%;
                 height: auto;
+                position: fixed;
+                bottom: 0;
+                top: auto;
                 flex-direction: row;
-                flex-wrap: wrap;
-                align-items: center;
-                justify-content: space-between;
-                padding: 15px;
-                box-sizing: border-box;
-                position: relative;
-                z-index: 10;
+                padding: 0;
+                border-right: none;
+                border-top: 1px solid #e9ecef;
+                box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
             }
 
-            .logo {
-                border: none;
-                margin: 0;
-                padding: 0;
-                font-size: 1.2rem;
-            }
+            .brand, .program-badge { display: none; }
 
             .nav-links {
-                display: flex;
+                flex-direction: row;
+                justify-content: space-around;
+                width: 100%;
+                padding: 0.5rem;
+            }
+
+            .nav-btn {
+                flex-direction: column;
                 gap: 5px;
-                overflow-x: auto;
-                width: 100%;
-                padding-top: 10px;
-                padding-bottom: 5px;
+                font-size: 0.7rem;
+                padding: 0.5rem;
+                border-radius: 8px;
+                justify-content: center;
+                text-align: center;
+                flex: 1;
             }
 
-            .nav-links li {
-                white-space: nowrap; /* Keep links on one line */
-                font-size: 0.9rem;
-                padding: 8px 12px;
-            }
-
-            .team-info { display: none; /* Hide team info on mobile to save space */ }
-
-            .main-container {
-                padding: 15px;
-                overflow: visible; /* Let body handle scroll */
-            }
-
-            /* Stack Grids */
-            .kpi-grid, .charts-row, .agenda-grid {
-                grid-template-columns: 1fr; /* Single column */
-            }
-
-            .controls {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .header div:last-child {
-                width: 100%;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-top: 10px;
-            }
+            .nav-btn i { font-size: 1.2rem; width: auto; }
             
-            /* Chart Adjustments */
-            .chart-box {
-                min-height: 200px;
-            }
+            main { padding: 1.5rem; }
+            .page-header h2 { font-size: 1.5rem; }
+            .page-header p { font-size: 0.95rem; }
         }
     </style>
 </head>
 <body>
 
-    <div class="sidebar">
-        <div class="logo">Connect <span>& Climb</span></div>
-        <ul class="nav-links">
-            <li onclick="switchTab('manager')" class="active" id="btn-manager">📊 Dashboard</li>
-            <li onclick="switchTab('agenda')" id="btn-agenda">📅 Agenda</li>
-            <li onclick="switchTab('trainee')" id="btn-trainee">🎓 My Journey</li>
-        </ul>
-        <div class="team-info">
-            <p><strong>Team:</strong><br>Farah, Ahmed, Shaymaa,<br>Alaa, Moustafa</p>
-        </div>
-    </div>
+    <div class="app-container">
+        
+        <!-- SIDEBAR (Becomes Bottom Nav on Mobile) -->
+        <nav class="sidebar">
+            <div class="brand">
+                <h1>Connect & Climb</h1>
+                <span>Onboarding Strategy</span>
+            </div>
 
-    <div class="main-container">
+            <div class="nav-links">
+                <button class="nav-btn active" onclick="showTab('strategy')">
+                    <i class="fas fa-chess-knight"></i>
+                    <span>Strategy</span>
+                </button>
+                <button class="nav-btn" onclick="showTab('roadmap')">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Roadmap</span>
+                </button>
+                <button class="nav-btn" onclick="showTab('team')">
+                    <i class="fas fa-users"></i>
+                    <span>Team</span>
+                </button>
+            </div>
 
-        <div id="manager" class="section active">
-            <div class="header">
-                <div>
-                    <h1>Program Overview</h1>
-                    <p>Monitoring Cohort Progress</p>
+            <div class="program-badge">
+                <strong>NTI | DEY Initiative</strong><br>
+                Class of 2025
+            </div>
+        </nav>
+
+        <!-- MAIN CONTENT -->
+        <main>
+            
+            <!-- VIEW 1: STRATEGY -->
+            <div id="strategy" class="section-view active">
+                <div class="page-header">
+                    <h2>The Strategic Vision</h2>
+                    <p>Bridging the gap between technical potential and professional performance.</p>
                 </div>
-                <div>
-                    <span style="font-size: 0.9rem; color: #7f8c8d;">Simulated Day:</span>
-                    <h2 id="dayDisplay" style="margin: 0; color: var(--accent);">Day 1</h2>
+
+                <div class="strategy-grid">
+                    <div class="card status-danger">
+                        <i class="fas fa-exclamation-triangle card-icon-bg"></i>
+                        <h3><i class="fas fa-user-slash"></i> The Problem</h3>
+                        <p><strong>High Turnover.</strong> Junior engineers feel isolated and overwhelmed. They lack the "soft" infrastructure to survive corporate culture, leading to early burnout.</p>
+                    </div>
+
+                    <div class="card status-success">
+                        <i class="fas fa-check-circle card-icon-bg"></i>
+                        <h3><i class="fas fa-puzzle-piece"></i> The Fix</h3>
+                        <p><strong>Structured Integration.</strong> Using Organizational Behavior (OB) principles to define culture and creating clear integration pathways from Day 1.</p>
+                    </div>
+
+                    <div class="card status-info">
+                        <i class="fas fa-tools card-icon-bg"></i>
+                        <h3><i class="fas fa-chart-line"></i> The Tool</h3>
+                        <p><strong>Performance Tracking.</strong> Measuring "intangibles" like Emotional Intelligence (EQ), Adaptability, and Ethics alongside technical KPIs.</p>
+                    </div>
+
+                    <div class="card status-warning">
+                        <i class="fas fa-hands-helping card-icon-bg"></i>
+                        <h3><i class="fas fa-brain"></i> The Model</h3>
+                        <p><strong>Head, Heart, Hands.</strong> A holistic mentorship approach: Growth Mindset (Head), Connection (Heart), and Technical Execution (Hands).</p>
+                    </div>
                 </div>
             </div>
 
-            <div class="kpi-grid">
-                <div class="card">
-                    <h3>Work Ethics</h3>
-                    <div class="value" id="kpi-ethics">92%</div>
-                </div>
-                <div class="card">
-                    <h3>EQ Score</h3>
-                    <div class="value" id="kpi-eq">85%</div>
-                </div>
-                <div class="card">
-                    <h3>Retention</h3>
-                    <div class="value" style="color: var(--success);">High</div>
-                </div>
-                <div class="card">
-                    <h3>Goals Met</h3>
-                    <div class="value" id="kpi-goals">3/10</div>
-                </div>
-            </div>
-
-            <div class="charts-row">
-                <div class="chart-box">
-                    <canvas id="progressChart"></canvas>
-                </div>
-                <div class="chart-box">
-                    <canvas id="radarChart"></canvas>
-                </div>
-            </div>
-
-            <div class="controls">
-                <div style="flex:1;">
-                    <label><strong>Simulate Progress (Day 1-10):</strong></label>
-                    <input type="range" min="1" max="10" value="1" style="width: 100%; margin-top: 10px;" oninput="updateSimulation(this.value)">
-                </div>
-                <button onclick="alert('Meeting Minutes Sent via Email!')" style="padding: 10px 20px; background: var(--brand); color: white; border: none; border-radius: 5px; cursor: pointer;">Send Minutes</button>
-            </div>
-        </div>
-
-        <div id="agenda" class="section">
-            <div class="header">
-                <h1>2-Week Roadmap</h1>
-                <p>Detailed Curriculum</p>
-            </div>
-
-            <div class="agenda-grid">
-                
-                <h3 class="week-title">Week 1: The Foundation (Culture & EQ)</h3>
-
-                <div class="day-card">
-                    <h4>Day 1: Structure</h4>
-                    <p style="font-size: 0.85rem; color: #7f8c8d;">Organizational Behavior</p>
-                    <ul style="padding-left: 20px;">
-                        <li>Intro to Company Structure: Mechanistic vs. Organic.</li>
-                        <li>Identifying reporting lines and hierarchy.</li>
-                        <li>Objective: Understand where you fit in the system.</li>
-                    </ul>
+            <!-- VIEW 2: ROADMAP -->
+            <div id="roadmap" class="section-view">
+                <div class="page-header">
+                    <h2>2-Week Onboarding Roadmap</h2>
+                    <p>A structured daily agenda to ensure successful integration.</p>
                 </div>
 
-                <div class="day-card">
-                    <h4>Day 2: Ethics & Brand</h4>
-                    <p style="font-size: 0.85rem; color: #7f8c8d;">Professionalism</p>
-                    <ul style="padding-left: 20px;">
-                        <li>Defining Integrity: Doing right when unseen.</li>
-                        <li>Digital Footprint Audit: Optimizing LinkedIn profiles.</li>
-                        <li>Objective: Align personal brand with company values.</li>
-                    </ul>
-                </div>
-
-                <div class="day-card">
-                    <h4>Day 3: Communication</h4>
-                    <p style="font-size: 0.85rem; color: #7f8c8d;">Meetings</p>
-                    <ul style="padding-left: 20px;">
-                        <li>The 3 Rules: Preparation, Discipline, Documentation.</li>
-                        <li>Training: Sending Meeting Minutes within 24h.</li>
-                        <li>Objective: Eliminate time-wasting meetings.</li>
-                    </ul>
-                </div>
-
-                <div class="day-card">
-                    <h4>Days 4-5: EQ Workshop</h4>
-                    <p style="font-size: 0.85rem; color: #7f8c8d;">Emotional Intelligence</p>
-                    <ul style="padding-left: 20px;">
-                        <li>The 4 Quadrants: Self-Awareness, Self-Mgmt, Social Awareness, Relationships.</li>
-                        <li>Empathy Integration Activity.</li>
-                        <li>Objective: Build the "Team Player" mindset.</li>
-                    </ul>
-                </div>
-
-                <h3 class="week-title">Week 2: The Execution (Strategy & Action)</h3>
-
-                <div class="day-card" style="border-left-color: var(--warning);">
-                    <h4>Day 6: Adaptability</h4>
-                    <p style="font-size: 0.85rem; color: #7f8c8d;">Flexibility</p>
-                    <ul style="padding-left: 20px;">
-                        <li>Simulation: "Shifting Project Priorities".</li>
-                        <li>Proactive vs. Reactive responses to change.</li>
-                        <li>Objective: Embrace volatility without panic.</li>
-                    </ul>
-                </div>
-
-                <div class="day-card" style="border-left-color: var(--warning);">
-                    <h4>Day 7: Productivity</h4>
-                    <p style="font-size: 0.85rem; color: #7f8c8d;">Time Mgmt</p>
-                    <ul style="padding-left: 20px;">
-                        <li>Eisenhower Matrix: Urgent vs. Important.</li>
-                        <li>Stress Mgmt: Remove / Change / Accept.</li>
-                        <li>Objective: Work smarter, not harder.</li>
-                    </ul>
-                </div>
-
-                <div class="day-card" style="border-left-color: var(--warning);">
-                    <h4>Day 8: Critical Thinking</h4>
-                    <p style="font-size: 0.85rem; color: #7f8c8d;">Problem Solving</p>
-                    <ul style="padding-left: 20px;">
-                        <li>Bloom's Taxonomy: Analyzing over Remembering.</li>
-                        <li>Identifying Logical Fallacies.</li>
-                        <li>Objective: Diagnose network issues logically.</li>
-                    </ul>
-                </div>
-
-                <div class="day-card" style="border-left-color: var(--success);">
-                    <h4>Days 9-10: Mentorship</h4>
-                    <p style="font-size: 0.85rem; color: #7f8c8d;">Graduation</p>
-                    <ul style="padding-left: 20px;">
-                        <li>Mentorship: Head, Heart, Hands Model.</li>
-                        <li>Final Deliverable: 90-Day Plan using SMART Goals.</li>
-                        <li>Objective: Launch into the role with clarity.</li>
-                    </ul>
-                </div>
-
-            </div>
-        </div>
-
-        <div id="trainee" class="section">
-            <div class="header">
-                <h1>My Journey</h1>
-                <p>Junior Engineer Portal</p>
-            </div>
-
-            <div style="max-width: 800px; margin: 0 auto;">
-                <div class="card" style="text-align: left;">
-                    <h3>✅ Week 1 Checklist</h3>
+                <div class="roadmap-container">
                     
-                    <div style="padding: 15px; background: white; border: 1px solid #eee; margin-bottom: 10px; border-radius: 8px; display: flex; gap: 10px;">
-                        <input type="checkbox" checked>
-                        <span>Review Organizational Chart (Mechanistic vs Organic)</span>
-                    </div>
-                    <div style="padding: 15px; background: white; border: 1px solid #eee; margin-bottom: 10px; border-radius: 8px; display: flex; gap: 10px;">
-                        <input type="checkbox" checked>
-                        <span>Sign Code of Ethics & Update LinkedIn</span>
-                    </div>
-                    <div style="padding: 15px; background: white; border: 1px solid #eee; margin-bottom: 10px; border-radius: 8px; display: flex; gap: 10px;">
-                        <input type="checkbox">
-                        <span>Practice "Self-Awareness" (Identify 1 stress trigger)</span>
-                    </div>
-                    <div style="padding: 15px; background: white; border: 1px solid #eee; margin-bottom: 10px; border-radius: 8px; display: flex; gap: 10px;">
-                        <input type="checkbox">
-                        <span>Create Eisenhower Matrix for next week's tasks</span>
-                    </div>
-                    <div style="padding: 15px; background: white; border: 1px solid #eee; margin-bottom: 10px; border-radius: 8px; display: flex; gap: 10px;">
-                        <input type="checkbox">
-                        <span><strong>FINAL:</strong> Submit 90-Day Action Plan (SMART Goals)</span>
+                    <!-- WEEK 1 -->
+                    <div class="week-column week-1">
+                        <div class="week-header">
+                            <i class="fas fa-seedling fa-2x"></i>
+                            <div>
+                                <h3 style="margin:0">Week 1: Foundation</h3>
+                                <span style="font-size:0.85rem; color:#6c757d">Culture & EQ</span>
+                            </div>
+                        </div>
+
+                        <div class="day-item">
+                            <div class="day-header">
+                                <span class="day-title">Day 1: Structure</span>
+                                <span class="tag" style="color:var(--accent)">Culture</span>
+                            </div>
+                            <div class="day-content">
+                                <ul>
+                                    <li><strong>OB Concept:</strong> Mechanistic vs. Organic Structures.</li>
+                                    <li><strong>Action:</strong> Map reporting lines.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="day-item">
+                            <div class="day-header">
+                                <span class="day-title">Day 2: Ethics & Brand</span>
+                                <span class="tag" style="color:var(--dark)">Pro</span>
+                            </div>
+                            <div class="day-content">
+                                <ul>
+                                    <li><strong>Ethics:</strong> Integrity when unseen.</li>
+                                    <li><strong>Action:</strong> LinkedIn Audit.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="day-item">
+                            <div class="day-header">
+                                <span class="day-title">Day 3: Communication</span>
+                                <span class="tag" style="color:var(--warning)">Meetings</span>
+                            </div>
+                            <div class="day-content">
+                                <ul>
+                                    <li><strong>Rules:</strong> Agenda, Time, Minutes.</li>
+                                    <li><strong>Action:</strong> Draft Minutes.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="day-item">
+                            <div class="day-header">
+                                <span class="day-title">Days 4-5: EQ Workshop</span>
+                                <span class="tag" style="color:var(--success)">Soft Skills</span>
+                            </div>
+                            <div class="day-content">
+                                <ul>
+                                    <li><strong>Focus:</strong> Self-Awareness & Empathy.</li>
+                                    <li><strong>Action:</strong> Team Bonding Activity.</li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
 
-                    <div style="background: #eef2ff; border: 1px solid #c7d2fe; padding: 15px; border-radius: 8px; margin-top: 20px; font-style: italic; color: #4b5563;">
-                        <strong>👨‍🏫 Mentor Says:</strong> "Remember, technical skills get you hired, but EQ gets you promoted. Don't forget to send your Meeting Minutes today!"
+                    <!-- WEEK 2 -->
+                    <div class="week-column week-2">
+                        <div class="week-header">
+                            <i class="fas fa-rocket fa-2x"></i>
+                            <div>
+                                <h3 style="margin:0">Week 2: Execution</h3>
+                                <span style="font-size:0.85rem; color:#6c757d">Strategy & Action</span>
+                            </div>
+                        </div>
+
+                        <div class="day-item">
+                            <div class="day-header">
+                                <span class="day-title">Day 6: Adaptability</span>
+                                <span class="tag" style="color:var(--warning)">Agile</span>
+                            </div>
+                            <div class="day-content">
+                                <ul>
+                                    <li><strong>Simulation:</strong> "Shifting Priorities" crisis.</li>
+                                    <li><strong>Focus:</strong> Proactive Response.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="day-item">
+                            <div class="day-header">
+                                <span class="day-title">Day 7: Productivity</span>
+                                <span class="tag" style="color:var(--primary)">Time</span>
+                            </div>
+                            <div class="day-content">
+                                <ul>
+                                    <li><strong>Tool:</strong> Eisenhower Matrix.</li>
+                                    <li><strong>Stress:</strong> Remove/Change/Accept.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="day-item">
+                            <div class="day-header">
+                                <span class="day-title">Day 8: Critical Thinking</span>
+                                <span class="tag" style="color:var(--danger)">Logic</span>
+                            </div>
+                            <div class="day-content">
+                                <ul>
+                                    <li><strong>Tool:</strong> Bloom's Taxonomy.</li>
+                                    <li><strong>Focus:</strong> Identifying Fallacies.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="day-item">
+                            <div class="day-header">
+                                <span class="day-title">Days 9-10: Graduation</span>
+                                <span class="tag" style="color:var(--success)">Goal</span>
+                            </div>
+                            <div class="day-content">
+                                <ul>
+                                    <li><strong>Mentorship:</strong> Head, Heart, Hands.</li>
+                                    <li><strong>Final:</strong> 90-Day SMART Plan.</li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
 
-                    <div style="margin-top: 20px; text-align: right;">
-                        <button onclick="alert('Progress Saved!')" style="padding: 10px 20px; background: var(--success); color: white; border: none; border-radius: 5px; cursor: pointer;">Save Progress</button>
+                </div>
+            </div>
+
+            <!-- VIEW 3: TEAM -->
+            <div id="team" class="section-view">
+                <div class="page-header">
+                    <h2>The Project Team</h2>
+                    <p>Designed during the NTI Soft Skills Track under Dr. Amira AbdElwahab.</p>
+                </div>
+
+                <div class="team-grid">
+                    <div class="team-card lead">
+                        <div class="avatar"><img src="images/M.jpg" alt="Moustafa" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;"></div>
+                        <h3>Moustafa</h3>
+                        <p>Team Lead & Coordinator</p>
+                    </div>
+
+                    <div class="team-card">
+                        <div class="avatar"><img src="images/f.jpg" alt="Farah" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;"></div>
+                        <h3>Farah</h3>
+                        <p>Research & Theory</p>
+                    </div>
+
+                    <div class="team-card">
+                        <div class="avatar"><img src="images/a.jpg" alt="Ahmed" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;"></div>
+                        <h3>Ahmed Fathy</h3>
+                        <p>Curriculum Phase 1</p>
+                    </div>
+
+                    <div class="team-card">
+                        <div class="avatar"><img src="images/s.jpg" alt="Shaymaa" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;"></div>
+                        <h3>Shaymaa</h3>
+                        <p>Curriculum Phase 2</p>
+                    </div>
+
+                    <div class="team-card">
+                        <div class="avatar"><img src="images/al.jpg" alt="Alaa" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;"></div>
+                        <h3>Alaa Ali</h3>
+                        <p>Strategy & Tools</p>
                     </div>
                 </div>
             </div>
-        </div>
 
+        </main>
     </div>
 
     <script>
-        // --- TAB SWITCHING LOGIC ---
-        function switchTab(tabId) {
+        function showTab(tabId) {
             // Hide all sections
-            document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-links li').forEach(el => el.classList.remove('active'));
-
-            // Show selected
+            document.querySelectorAll('.section-view').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            
+            // Show target
             document.getElementById(tabId).classList.add('active');
-            document.getElementById('btn-' + tabId).classList.add('active');
-        }
-
-        // --- CHART JS LOGIC ---
-        const ctxProgress = document.getElementById('progressChart').getContext('2d');
-        const progressChart = new Chart(ctxProgress, {
-            type: 'line',
-            data: {
-                labels: ['Day 1', 'Day 3', 'Day 5', 'Day 7', 'Day 10'],
-                datasets: [{
-                    label: 'Cohort Integration %',
-                    data: [10, 30, 50, 70, 90],
-                    borderColor: '#3498db',
-                    tension: 0.4,
-                    fill: true,
-                    backgroundColor: 'rgba(52, 152, 219, 0.1)'
-                }]
-            },
-            options: { 
-                responsive: true, 
-                maintainAspectRatio: false,
-                plugins: { title: { display: true, text: 'Overall Onboarding Progress' } } 
-            }
-        });
-
-        const ctxRadar = document.getElementById('radarChart').getContext('2d');
-        const radarChart = new Chart(ctxRadar, {
-            type: 'radar',
-            data: {
-                labels: ['Ethics', 'EQ', 'Adaptability', 'Comm.', 'Tech'],
-                datasets: [{
-                    label: 'Class Avg',
-                    data: [80, 60, 50, 60, 85],
-                    backgroundColor: 'rgba(46, 204, 113, 0.2)',
-                    borderColor: '#2ecc71',
-                    pointBackgroundColor: '#2ecc71'
-                }]
-            },
-            options: { 
-                responsive: true, 
-                maintainAspectRatio: false,
-                scales: { r: { beginAtZero: true, max: 100 } } 
-            }
-        });
-
-        // --- SIMULATION LOGIC ---
-        function updateSimulation(day) {
-            document.getElementById('dayDisplay').innerText = 'Day ' + day;
             
-            // Simulate Metric Growth based on curriculum
-            let ethics = Math.min(80 + (day * 1.5), 100).toFixed(0); 
-            let eq = Math.min(40 + (day * 5), 90).toFixed(0);        
-            let goals = Math.min(day, 10);
-
-            // Update Text
-            document.getElementById('kpi-ethics').innerText = ethics + '%';
-            document.getElementById('kpi-eq').innerText = eq + '%';
-            document.getElementById('kpi-goals').innerText = goals + '/10';
-
-            // Update Radar Chart dynamically
-            let adaptability = 40 + (day * 4); 
-            let comm = 50 + (day * 3);
+            // Highlight nav button (find by onclick attribute match for simplicity in this static page)
+            const btns = document.querySelectorAll('.nav-btn');
+            btns.forEach(btn => {
+                if(btn.getAttribute('onclick').includes(tabId)) {
+                    btn.classList.add('active');
+                }
+            });
             
-            radarChart.data.datasets[0].data = [ethics, eq, adaptability, comm, 85];
-            radarChart.update();
+            // Scroll to top on mobile
+            window.scrollTo(0,0);
         }
     </script>
 </body>
